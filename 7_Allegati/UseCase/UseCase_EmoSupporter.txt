@@ -5,18 +5,18 @@ actor User
 actor AI_OpenCV
 rectangle Application {
   User -- (Watch the webcam)
-  User -- (Ask report)
-  AI_OpenCV -- (Understand the expression)
+  User - (Ask report)
+  AI_OpenCV --- (Understand the expression)
   
   (Watch the webcam) .> (Reconize face) : include
   (Reconize face) ..> (Understand the expression) : include
   (Understand the expression) .> (Take informations) : include
   (Take informations) ..> (Elaborate data) : include
   
-  (Elaborate data) ..> (Store all data) : include
-  (Ask report) ..> (Create report) : include
+  (Elaborate data) .> (Store all data) : include
   (Store all data) ..> (Create report) : include
-
+  (Ask report) ..> (Create report) : include
+  
   (User Interaction) .> (Elaborate data) : extend
   (Image pop-up) ..> (User Interaction) : extend
   (Vocal response) .> (User Interaction) : extend
