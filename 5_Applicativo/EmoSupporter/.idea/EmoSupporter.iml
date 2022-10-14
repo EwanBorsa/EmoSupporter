@@ -9,7 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/venv/Lib/site-packages/Pillow-9.2.0.dist-info" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/venv/Lib/site-packages/six-1.16.0.dist-info" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (EmoSupporter)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
