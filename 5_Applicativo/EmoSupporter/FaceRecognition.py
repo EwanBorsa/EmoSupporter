@@ -13,89 +13,7 @@ face_classifier = cv2.CascadeClassifier()
 face_classifier.load(cv2.samples.findFile(haarcascadePath))
 
 
-def conf_panel():
-    SG.theme("LightGreen")
-
-    # Define the window layout
-    layout = [
-        [SG.Text("Settings", size=(60, 1), justification="center")],
-        [SG.Radio("None", "Radio", True, size=(10, 1))],
-        [
-            SG.Radio("threshold", "Radio", size=(10, 1), key="-THRESH-"),
-            SG.Slider(
-                (0, 255),
-                128,
-                1,
-                orientation="h",
-                size=(40, 15),
-                key="-THRESH SLIDER-",
-            ),
-        ],
-        [
-            SG.Radio("canny", "Radio", size=(10, 1), key="-CANNY-"),
-            SG.Slider(
-                (0, 255),
-                128,
-                1,
-                orientation="h",
-                size=(20, 15),
-                key="-CANNY SLIDER A-",
-            ),
-            SG.Slider(
-                (0, 255),
-                128,
-                1,
-                orientation="h",
-                size=(20, 15),
-                key="-CANNY SLIDER B-",
-            ),
-        ],
-        [
-            SG.Radio("blur", "Radio", size=(10, 1), key="-BLUR-"),
-            SG.Slider(
-                (1, 11),
-                1,
-                1,
-                orientation="h",
-                size=(40, 15),
-                key="-BLUR SLIDER-",
-            ),
-        ],
-        [
-            SG.Radio("hue", "Radio", size=(10, 1), key="-HUE-"),
-            SG.Slider(
-                (0, 225),
-                0,
-                1,
-                orientation="h",
-                size=(40, 15),
-                key="-HUE SLIDER-",
-            ),
-        ],
-        [
-            SG.Radio("enhance", "Radio", size=(10, 1), key="-ENHANCE-"),
-            SG.Slider(
-                (1, 255),
-                128,
-                1,
-                orientation="h",
-                size=(40, 15),
-                key="-ENHANCE SLIDER-",
-            ),
-        ],
-    ]
-
-    # Create the window and show it without the plot
-    window = SG.Window("Configuration panel", layout, location=(700, 350))
-    while True:
-        event, values = window.read(timeout=20)
-        if event == "Exit" or event == SG.WIN_CLOSED:
-            break
-    window.close()
-
-
 def start_video():
-
     # Initialize video capture
     cap = cv2.VideoCapture(0)
     # scaling factor
@@ -123,24 +41,3 @@ def start_video():
     cap.release()
     # Close all active windows
     cv2.destroyAllWindows()
-
-
-def on_clicked(icon, item):
-    if str(item) == "Start":
-        print("Video capturing...")
-        start_video()
-    elif str(item) == "Settings":
-        conf_panel()
-    elif str(item) == "Exit":
-        icon.stop()
-
-
-image = Image.open(iconPath)
-
-icon = pystray.Icon("EmoSupporter", image, menu=pystray.Menu(
-    pystray.MenuItem("Start", on_clicked),
-    pystray.MenuItem("Settings", on_clicked),
-    pystray.MenuItem("Exit", on_clicked)
-))
-
-icon.run()
