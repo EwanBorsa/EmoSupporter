@@ -5,6 +5,7 @@ from keras import models
 import numpy as np
 # import tensorflow as tf
 import os
+import datetime
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -12,13 +13,18 @@ model = models.Sequential()
 
 iconPath = './assets/emo-sup.png'
 haarcascadePath = './assets/haarcascade_frontalface_default.xml'
-motion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad', 'Surprise']
+emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad', 'Surprise']
+emotion_colors = ['Red', 'Green', 'Purple', 'Yellow', 'Gray', 'Blue', 'Orange']
 # Haar Cascade classifiers are an effective way for object detection.
 face_classifier = cv2.CascadeClassifier()
 face_classifier.load(cv2.samples.findFile(haarcascadePath))
+dateToday = str(datetime.datetime.now().year) + "." + \
+            str(datetime.datetime.now().month) + "." + \
+            str(datetime.datetime.now().day)
+file = open("data_log/" + dateToday + "", "a")
 
 
-# dataset1 = tf.data.Dataset.from_tensor_slices(tf.random.uniform([4, 10]))
+# dataset1 = tf.data_log.Dataset.from_tensor_slices(tf.random.uniform([4, 10]))
 # print(dataset1.element_spec)
 
 def start_video():
@@ -34,17 +40,34 @@ def start_video():
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Detect faces on the webcam
         faces = face_classifier.detectMultiScale(frame_gray)
-        # Print the data about the recognition of faces on the webcam
+        # Print the data_log about the recognition of faces on the webcam
         # print(faces)  # DEBUG
         # making a try and except condition in case of any errors
         emotion = "null"
         try:
+            date_today = str(datetime.datetime.now().year) + "." + \
+                         str(datetime.datetime.now().month) + "." + \
+                         str(datetime.datetime.now().day)
+            file = open("data_log/" + date_today + "_EmotionsDetected", "a")
             analyze = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
-            print(analyze)  # DEBUG
+            #  print(analyze)  # DEBUG
+            date = str(datetime.datetime.now().hour) + ":" + \
+                   str(datetime.datetime.now().minute) + ":" + \
+                   str(datetime.datetime.now().second)
             emotion = analyze['dominant_emotion']
+            file.write(emotion + "-" + date + "\n")
         finally:
             font = cv2.FONT_HERSHEY_DUPLEX
-        for face in faces:
+        # for face in faces:  # For all faces
+        if len(faces) == 0:
+            cv2.putText(img=frame,
+                        text="Undetected face",
+                        org=(5, 5),
+                        fontFace=font,
+                        fontScale=0.5,
+                        color=(111, 111, 111))
+        else:
+            face = faces[0]  # For one face
             x, y, w, h = face
             cv2.putText(img=frame,
                         text=emotion,
@@ -66,5 +89,7 @@ def start_video():
             break
     # Release the video capture object
     cap.release()
+    # Close the file that im writing
+    file.close()
     # Close all active windows
     cv2.destroyAllWindows()

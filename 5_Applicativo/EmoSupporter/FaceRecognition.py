@@ -26,7 +26,7 @@ def start_video():
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Detect faces on the webcam
         faces = face_classifier.detectMultiScale(frame_gray)
-        # Print the data about the recognition of faces on the webcam
+        # Print the data_log about the recognition of faces on the webcam
         for face in faces:
             x, y, w, h = face
             new_frame = cv2.rectangle(frame, (x, y), (x+w, y+h), color=(219, 112, 147), thickness=3)
