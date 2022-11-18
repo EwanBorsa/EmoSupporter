@@ -26,21 +26,24 @@ def conf_panel():
                 enable_events=True,
                 default=True)
         ],
-        [SG.Text("Reports", size=(60, 2), justification="center")],
-        [SG.Button("Ask statistic report", size=(60, 2))],
-        [SG.Button("Ask graphics report", size=(60, 2))]
+        [SG.Text('Reports', size=(60, 2), justification='center')],
+        [SG.Button('Ask statistic report', size=(60, 2))],
+        [SG.Button('Ask graphics report', size=(60, 2))]
     ]
 
     # Create the window and show it without the plot
     window = SG.Window("Configuration panel", layout, location=(700, 350))
     while True:
         event, values = window.read(timeout=20)
-        conf_data['cam']['face'] = values['seeFace']
-        conf_data['cam']['emotion'] = values['seeEmo']
+        if conf_data['cam']:
+            conf_data['cam']['face'] = values['seeFace']
+            conf_data['cam']['emotion'] = values['seeEmo']
         if event == 'Ask statistic report':
-            print("stat report")
-        if event == 'Ask statistic report':
-            print("graph report")
+            print('stat report')
+            EmoRec.askStatReport()
+        if event == 'Ask graphics report':
+            print('graph report')
+            EmoRec.askGraphReport()
         if event == "Exit" or event == SG.WIN_CLOSED:
             break
     window.close()

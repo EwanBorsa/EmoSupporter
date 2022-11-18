@@ -26,9 +26,43 @@ dateToday = str(datetime.datetime.now().year) + "." + \
             str(datetime.datetime.now().month) + "." + \
             str(datetime.datetime.now().day)
 
-
+full_scrn = True
 # dataset1 = tf.data_log.Dataset.from_tensor_slices(tf.random.uniform([4, 10]))
 # print(dataset1.element_spec)
+
+
+def makeStat():
+    tot_emotion = 0
+    for value in emotion_values:
+        tot_emotion += value
+    emotion_perc = [0, 0, 0, 0, 0, 0, 0]
+    for i in emotion_perc:
+        emotion_perc[i] = emotion_values[i]/tot_emotion
+    return emotion_perc
+
+
+def makeStatReport():
+    emotion_perc = makeStat()
+    text = "\t_\tStatistic _ Report\t_\n\n\n"
+    for i in emotion_perc:
+        text += "\n\tEmotion: " + emotion_labels[i] + " = " + emotion_perc[i] + " %\n"
+
+
+def makeGraph():
+    emotion_perc = makeStat()
+
+    # make a graph
+
+
+def makeGraphReport():
+    print("d")
+    # make
+
+
+def makeTextLog(name, text, date):
+    file = open("data_log/" + date + "_" + name, "a")
+    file.write(text)
+
 
 def start_video(cam_conf):
     # Initialize video capture
@@ -51,7 +85,6 @@ def start_video(cam_conf):
             date_today = str(datetime.datetime.now().year) + "." + \
                          str(datetime.datetime.now().month) + "." + \
                          str(datetime.datetime.now().day)
-            file = open("data_log/" + date_today + "_DominantEmotions", "a")
             file = open("data_log/" + date_today + "_DominantEmotions", "a")
             analyze = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
             print(analyze)
@@ -96,6 +129,7 @@ def start_video(cam_conf):
                               thickness=2)
         # Resize the normal frame
         frame = cv2.resize(frame, None, fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_AREA)
+        cv2.setWindowProperty(frame=frame, full_scrn=full_scrn)
         # Display the image
         if cam_conf['face']:
             cv2.imshow('Emotion Detector', frame)
