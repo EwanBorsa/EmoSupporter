@@ -6,11 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="127effe2-1f2c-4c85-9bf7-a8caedb46444" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../../4_Diari/Diario-21_10_22-EmoSupporter - Copia.docx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/EmoSupporter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/EmoSupporter.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionalRecognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/EmotionalRecognition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FaceRecognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/FaceRecognition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/haarcascade_frontalface_default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/assets/haarcascade_frontalface_default.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,10 +33,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Scuola\Informatica\M306\Progetti\EmoSupporter\5_Applicativo\EmoSupporter\assets\images" />
       <recent name="E:\Scuola\Informatica\M306\Progetti\EmoSupporter\5_Applicativo\EmoSupporter" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.EmotionalRecognition">
     <configuration name="EmotionalRecognition" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="EmoSupporter" />
       <option name="INTERPRETER_OPTIONS" value="" />

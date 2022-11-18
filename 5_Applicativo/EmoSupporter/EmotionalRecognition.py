@@ -1,8 +1,10 @@
-from xml.etree.ElementTree import TreeBuilder
+# from xml.etree.ElementTree import TreeBuilder
 import cv2
 from deepface import DeepFace
 from keras import models
 import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
 # import tensorflow as tf
 import os
 import datetime
@@ -13,15 +15,16 @@ model = models.Sequential()
 
 iconPath = './assets/emo-sup.png'
 haarcascadePath = './assets/haarcascade_frontalface_default.xml'
-emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad', 'Surprise']
-emotion_colors = ['Red', 'Green', 'Purple', 'Yellow', 'Gray', 'Blue', 'Orange']
+emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+emotion_colors = ['Red', 'Green', 'Purple', 'Yellow', 'Blue', 'Orange',  'Gray']
+#                 A  D  F  H  S  S  N
+emotion_values = [0, 0, 0, 0, 0, 0, 0]
 # Haar Cascade classifiers are an effective way for object detection.
 face_classifier = cv2.CascadeClassifier()
 face_classifier.load(cv2.samples.findFile(haarcascadePath))
 dateToday = str(datetime.datetime.now().year) + "." + \
             str(datetime.datetime.now().month) + "." + \
             str(datetime.datetime.now().day)
-file = open("data_log/" + dateToday + "", "a")
 
 
 # dataset1 = tf.data_log.Dataset.from_tensor_slices(tf.random.uniform([4, 10]))
@@ -48,8 +51,18 @@ def start_video():
             date_today = str(datetime.datetime.now().year) + "." + \
                          str(datetime.datetime.now().month) + "." + \
                          str(datetime.datetime.now().day)
-            file = open("data_log/" + date_today + "_EmotionsDetected", "a")
+            file = open("data_log/" + date_today + "_DominantEmotions", "a")
+            file = open("data_log/" + date_today + "_DominantEmotions", "a")
             analyze = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
+            print(analyze)
+            emotion_values[0] += analyze['emotion']['angry']
+            emotion_values[1] += analyze['emotion']['disgust']
+            emotion_values[2] += analyze['emotion']['fear']
+            emotion_values[3] += analyze['emotion']['happy']
+            emotion_values[4] += analyze['emotion']['sad']
+            emotion_values[5] += analyze['emotion']['surprise']
+            emotion_values[6] += analyze['emotion']['neutral']
+            print(emotion_values)
             #  print(analyze)  # DEBUG
             date = str(datetime.datetime.now().hour) + ":" + \
                    str(datetime.datetime.now().minute) + ":" + \
@@ -93,3 +106,12 @@ def start_video():
     file.close()
     # Close all active windows
     cv2.destroyAllWindows()
+
+
+ImageAddress = 'assets/images/jokes/1.jpg'
+ImageItself = Image.open(ImageAddress)
+cv2.imshow(ImageItself)
+cv2.draw()
+cv2.pause(10)  # pause how many seconds
+cv2.close()
+start_video()

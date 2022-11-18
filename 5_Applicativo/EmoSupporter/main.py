@@ -1,13 +1,12 @@
 import pystray
 from PIL import Image
-# from PIL.Image import core as _imaging
 import PySimpleGUI as SG
 import cv2
 import EmotionalRecognition as EmoRec
 
 # import numpy
 
-iconPath = './assets/emo-sup.png'
+iconPath = './assets/images/emo-sup.png'
 haarcascadePath = './assets/haarcascade_frontalface_default.xml'
 motion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad', 'Surprise']
 # Haar Cascade classifiers are an effective way for object detection.
