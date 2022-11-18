@@ -1,38 +1,31 @@
 import pystray
 from PIL import Image
 import PySimpleGUI as SG
-import cv2
 import EmotionalRecognition as EmoRec
 
-# import numpy
-
 iconPath = './assets/images/emo-sup.png'
-haarcascadePath = './assets/haarcascade_frontalface_default.xml'
-motion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad', 'Surprise']
-# Haar Cascade classifiers are an effective way for object detection.
-face_classifier = cv2.CascadeClassifier()
-face_classifier.load(cv2.samples.findFile(haarcascadePath))
+
+conf_data = {'cam': {'face': True, 'emotion': True, 'color': 'Purple'}}
 
 
 def conf_panel():
     SG.theme("Purple")
-
     # Define the window layout
     layout = [
         [SG.Text("Settings", size=(60, 1), justification="center")],
-        [SG.Radio("None", "Radio", True, size=(10, 1))],
         [
-            SG.Radio("threshold", "Radio", size=(10, 1), key="-THRESH-"),
-            SG.Slider(
-                (0, 255),
-                128,
-                1,
-                orientation="h",
-                size=(40, 15),
-                key="-THRESH SLIDER-",
-            ),
+            SG.Text('Impostazioni Cam: '),
+            SG.Checkbox(
+                'Mostra faccia',
+                key='seeFace',
+                enable_events=True,
+                default=True),
+            SG.Checkbox(
+                'Mostra emozioni',
+                key='seeEmo',
+                enable_events=True,
+                default=True)
         ],
-        [SG.Text("________________________", size=(60, 2), justification="center")],
         [SG.Text("Reports", size=(60, 2), justification="center")],
         [SG.Button("Ask statistic report", size=(60, 2))],
         [SG.Button("Ask graphics report", size=(60, 2))]
@@ -42,6 +35,12 @@ def conf_panel():
     window = SG.Window("Configuration panel", layout, location=(700, 350))
     while True:
         event, values = window.read(timeout=20)
+        conf_data['cam']['face'] = values['seeFace']
+        conf_data['cam']['emotion'] = values['seeEmo']
+        if event == 'Ask statistic report':
+            print("stat report")
+        if event == 'Ask statistic report':
+            print("graph report")
         if event == "Exit" or event == SG.WIN_CLOSED:
             break
     window.close()
@@ -50,7 +49,7 @@ def conf_panel():
 def on_clicked(icon, item):
     if str(item) == "Start":
         print("Video capturing...")
-        EmoRec.start_video()
+        EmoRec.start_video(conf_data['cam'])
     elif str(item) == "Settings":
         conf_panel()
     elif str(item) == "Exit":

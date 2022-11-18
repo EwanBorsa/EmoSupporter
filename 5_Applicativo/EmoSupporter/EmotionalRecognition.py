@@ -30,7 +30,7 @@ dateToday = str(datetime.datetime.now().year) + "." + \
 # dataset1 = tf.data_log.Dataset.from_tensor_slices(tf.random.uniform([4, 10]))
 # print(dataset1.element_spec)
 
-def start_video():
+def start_video(cam_conf):
     # Initialize video capture
     cap = cv2.VideoCapture(0)
     # scaling factor
@@ -71,32 +71,34 @@ def start_video():
             file.write(emotion + "-" + date + "\n")
         finally:
             font = cv2.FONT_HERSHEY_DUPLEX
-        # for face in faces:  # For all faces
-        if len(faces) == 0:
-            cv2.putText(img=frame,
-                        text="Undetected face",
-                        org=(5, 5),
-                        fontFace=font,
-                        fontScale=0.5,
-                        color=(111, 111, 111))
-        else:
-            face = faces[0]  # For one face
-            x, y, w, h = face
-            cv2.putText(img=frame,
-                        text=emotion,
-                        org=(x, y),
-                        fontFace=font,
-                        fontScale=1,
-                        color=(250, 130, 169))
-            cv2.rectangle(frame,
-                          (x, y),
-                          (x + w, y + h),
-                          color=(200, 90, 130),
-                          thickness=2)
+        if cam_conf['emotion']:
+            # for face in faces:  # For all faces
+            if len(faces) == 0:
+                cv2.putText(img=frame,
+                            text="Undetected face",
+                            org=(5, 5),
+                            fontFace=font,
+                            fontScale=0.5,
+                            color=(111, 111, 111))
+            else:
+                face = faces[0]  # For one face
+                x, y, w, h = face
+                cv2.putText(img=frame,
+                            text=emotion,
+                            org=(x, y),
+                            fontFace=font,
+                            fontScale=1,
+                            color=(250, 130, 169))
+                cv2.rectangle(frame,
+                              (x, y),
+                              (x + w, y + h),
+                              color=(200, 90, 130),
+                              thickness=2)
         # Resize the normal frame
         frame = cv2.resize(frame, None, fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_AREA)
         # Display the image
-        cv2.imshow('Emotion Detector', frame)
+        if cam_conf['face']:
+            cv2.imshow('Emotion Detector', frame)
         # Detect if the Esc key has been pressed
         if cv2.waitKey(1) == 27:
             break
@@ -108,10 +110,8 @@ def start_video():
     cv2.destroyAllWindows()
 
 
-ImageAddress = 'assets/images/jokes/1.jpg'
-ImageItself = Image.open(ImageAddress)
-cv2.imshow(ImageItself)
-cv2.draw()
-cv2.pause(10)  # pause how many seconds
-cv2.close()
-start_video()
+#ImageAddress = 'assets/images/jokes/1.jpg'
+#imgColor = cv2.imread(ImageAddress, 1)
+#cv2.imshow("Image", imgColor)
+
+#start_video()
