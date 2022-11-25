@@ -32,7 +32,7 @@ full_scrn = True
 
 
 def makeStat():
-    tot_emotion = 0
+    tot_emotion = 1
     for value in emotion_values:
         tot_emotion += value
     emotion_perc = [0, 0, 0, 0, 0, 0, 0]
@@ -41,11 +41,13 @@ def makeStat():
     return emotion_perc
 
 
-def makeStatReport():
+def askStatReport():
     emotion_perc = makeStat()
     text = "\t_\tStatistic _ Report\t_\n\n\n"
-    for i in emotion_perc:
-        text += "\n\tEmotion: " + emotion_labels[i] + " = " + emotion_perc[i] + " %\n"
+    i = 0
+    for value in emotion_perc:
+        text += "\n\tEmotion: " + emotion_labels[i] + " = " + str(value) + " %\n"
+        i++1
 
 
 def makeGraph():
@@ -54,7 +56,7 @@ def makeGraph():
     # make a graph
 
 
-def makeGraphReport():
+def askGraphReport():
     print("d")
     # make
 
@@ -69,6 +71,7 @@ def start_video(cam_conf):
     cap = cv2.VideoCapture(0)
     # scaling factor
     scaling_factor = 1.5
+    # Controllo se ci sono webcam
     # Loop until you hit the Esc key
     while True:
         # Capture the current frame

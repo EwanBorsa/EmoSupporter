@@ -1,24 +1,29 @@
 @startuml
 left to right direction
 skinparam packageStyle rectangle
-actor User
-actor AI_OpenCV
-rectangle Application {
-  User -- (Watch the webcam)
-  User - (Ask report)
-  AI_OpenCV --- (Understand the expression)
-  
-  (Watch the webcam) .> (Reconize face) : include
-  (Reconize face) ..> (Understand the expression) : include
-  (Understand the expression) .> (Take informations) : include
-  (Take informations) ..> (Elaborate data) : include
-  
-  (Elaborate data) .> (Store all data) : include
-  (Store all data) ..> (Create report) : include
-  (Ask report) ..> (Create report) : include
-  
-  (User Interaction) .> (Elaborate data) : extend
-  (Image pop-up) ..> (User Interaction) : extend
-  (Vocal response) .> (User Interaction) : extend
+actor Utente
+actor App
+rectangle EmoSupporter {
+  Utente - (Apre l'Applicazione)
+  Utente - (Avvia la Registrazione)
+  Utente - (Guarda la WebCam) 
+  Utente - (Visualizza il Report)
+
+  App - (Rileva volto dell'Utente)
+  App - (Riconosce espressione facciale)
+  App - (Registra dati dell'Utente)
+  App - (Interagisce con l'Utente)
+
+  (Configura l'Applicazione) .> (Apre l'Applicazione) : extend
+  (Report testuale) .> (Visualizza il Report) : extend
+  (Report grafico) .> (Visualizza il Report) : extend
+  (Scarica testo) .> (Report testuale) : extend
+  (Scarica immagine) .> (Report grafico) : extend
+
+  (Rileva volto dell'Utente)
+  (Riconosce espressione facciale) .> (Rileva volto dell'Utente) : include
+  (Registra dati dell'Utente) .> (Riconosce espressione facciale) : include
+  (Immagini Pop-Up) .> (Interagisce con l'Utente) : extend
+  (Risposta Vocale) .> (Interagisce con l'Utente) : extend
 }
 @enduml
