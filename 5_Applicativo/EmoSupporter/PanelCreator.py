@@ -7,11 +7,12 @@ file_types = [("JPEG (*.jpg)", "*.jpg"),
               ("All files (*.*)", "*.*")]
 
 
-def confPanel(conf_data):
+def confPanel(conf_data, ava_ports):
     SG.theme("Purple")
     # Define the window layout
     layout = [
         [SG.Text("Impostazioni", size=(45, 1), justification="center")],
+        [SG.Text('Nome utente: '), SG.InputText("utente", size=(45, 1), key="name")],
         [
             SG.Text('WebCam: '),
             SG.Checkbox(
@@ -24,7 +25,8 @@ def confPanel(conf_data):
                 key='emotion',
                 enable_events=True,
                 default=True)],
-        [SG.Listbox(webcamList(), size=(50, 3), enable_events=False, key='port')],
+        [SG.Text("Webcam disponibili per l'uso:")],
+        [SG.Listbox(webcamList(ava_ports), size=(50, 3), enable_events=False, key='port')],
         [
             SG.Text('Output: '),
             SG.Checkbox(
@@ -50,11 +52,13 @@ def confPanel(conf_data):
     while True:
         event, values = window.read(timeout=20)
         if event == 'Salva':
+            print(values)
             conf_data['cam']['face'] = values['face']
             conf_data['cam']['emotion'] = values['emotion']
-            conf_data['cam']['port'] = values['port']
+            conf_data['cam']['port'] = int(values['port'])
             conf_data['output']['popup'] = values['popup']
             conf_data['output']['voice'] = values['voice']
+            conf_data['user']['name'] = values['name']
         if event == "Report Statistico":
             EmoRec.askStatReport(values['session'])
             print("report Statistico")
@@ -66,8 +70,8 @@ def confPanel(conf_data):
     window.close()
 
 
-def webcamList():
+def webcamList(ava_ports):
     ports = []
-    for port in EmoRec.availablePorts():
-        ports.append("Webcam " + str(port + 1) + " disponibile per l'uso")
+    for port in ava_ports:
+        ports.append(str(port))
     return ports

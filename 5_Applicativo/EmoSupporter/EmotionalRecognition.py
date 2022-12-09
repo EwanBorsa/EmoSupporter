@@ -68,13 +68,15 @@ def makeTextLog(dir_name, text, date):
     file.close()
 
 
-def startVideo(cam_conf):
+def startVideo(conf):
+    engine.say("Benvenuto " + conf['user']['name'] + " ad una nuova sessione")
     # Initialize video capture
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(conf['cam']['port'])
     # scaling factor
     scaling_factor = 1.5
     # Loop until you hit the Esc key
     while True:
+        engine.runAndWait()
         # Capture the current frame
         ret, frame = cap.read()
         # Create a gray version of the frame
@@ -95,7 +97,7 @@ def startVideo(cam_conf):
             makeTextLog('DominantEmotions', emotion + "-" + timeNow() + "\n", dateToday())
         finally:
             font = cv2.FONT_HERSHEY_DUPLEX
-        if cam_conf['emotion']:
+        if conf['cam']['emotion']:
             if len(faces) == 0:
                 cv2.putText(img=frame,
                             text="Faccia non rilevata",
@@ -120,7 +122,7 @@ def startVideo(cam_conf):
         # Corregge la grandezza del frame in base alla finestra
         frame = cv2.resize(frame, None, fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_AREA)
         # Mostro la visione della WebCam in base alle impostazioni scelte dall'utente
-        if cam_conf['face']:
+        if conf['cam']['face']:
             cv2.imshow('Emotion Detector', frame)
         # Se viene premuto il tasto Esc finisce il ciclo while
         if cv2.waitKey(1) == 27:
@@ -202,25 +204,26 @@ def imagePopUp(img_type):
             engine.say("Guarda questo cucciolo quanto è carino!")
     if img_type == 'comic':
         image_address = 'assets/images/jokes/' + str(random.randint(1, 19)) + '.jpg'
+        engine.say("Guarda questa battuta, che ridere")
     if img_type == 'calm':
         image_address = 'assets/images/calm_places/' + str(random.randint(1, 9)) + '.jpg'
+        engine.say("Molto rilassante quel paesaggio, non trovi?")
     win_name = "Image: " + img_type
     cv2.namedWindow(win_name)
     cv2.moveWindow(win_name, random.randint(50, 100), random.randint(50, 100))
     cv2.imshow(win_name, cv2.imread(image_address, 1))
 
 
-# language  : en_US, de_DE, ...
-# gender    : VoiceGenderFemale, VoiceGenderMale
-def change_voice(engine, language, gender='VoiceGenderFemale'):
-    for voice in engine.getProperty('voices'):
-        if language in voice.languages and gender == voice.gender:
-            engine.setProperty('voice', voice.id)
+def change_voice(eng, language):
+    voices = engine.getProperty("voices")
+    for voice in voices:
+        # print(str(voice.name).lower())
+        if language in str(voice.name).lower():
+            eng.setProperty('voice', voice.id)
             return True
+    raise RuntimeError("Language '{}' not found".format(language))
 
-    raise RuntimeError("Language '{}' for gender '{}' not found".format(language, gender))
 
-
-change_voice(engine, "it_IT", "VoiceGenderFemale")
+change_voice(engine, "ita")
 # start_video()
 # print(listaPorte())
