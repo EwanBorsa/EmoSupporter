@@ -5,7 +5,8 @@ import PanelCreator as Panel
 
 iconPath = './assets/images/emo-sup.png'
 
-conf_data = {'cam': {'face': True, 'emotion': True, 'color': 'Purple'}, 'output': {'popup': True, 'voice': True}}
+conf_data = {'cam': {'face': True, 'emotion': True, 'color': 'Purple', 'port': 0},
+             'output': {'popup': True, 'voice': True}}
 
 
 def on_clicked(icon, item):

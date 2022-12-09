@@ -4,16 +4,15 @@ from deepface import DeepFace
 from keras import models
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
 # import tensorflow as tf
 import os
 import datetime
 import random
+import pyttsx3
 
+engine = pyttsx3.init()
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
 model = models.Sequential()
-
 iconPath = './assets/emo-sup.png'
 haarcascadePath = './assets/haarcascade_frontalface_default.xml'
 emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
@@ -24,13 +23,6 @@ counters = {'angry': 1, 'fear': 1, 'disgust': 1, 'sad': 1}
 # Haar Cascade classifiers are an effective way for object detection.
 face_classifier = cv2.CascadeClassifier()
 face_classifier.load(cv2.samples.findFile(haarcascadePath))
-dateToday = str(datetime.datetime.now().year) + "." + \
-            str(datetime.datetime.now().month) + "." + \
-            str(datetime.datetime.now().day)
-
-full_scrn = True
-
-
 # dataset1 = tf.data_log.Dataset.from_tensor_slices(tf.random.uniform([4, 10]))
 # print(dataset1.element_spec)
 
@@ -55,8 +47,9 @@ def makeStatText():
     return text
 
 
-def askStatReport():
+def askStatReport(session):
     text = makeStatText()
+    print(text)
 
 
 def makeGraph():
@@ -64,14 +57,15 @@ def makeGraph():
     # make a graph
 
 
-def askGraphReport():
+def askGraphReport(session):
     print("d")
     # make
 
 
-def makeTextLog(name, text, date):
-    file = open("data_log/" + date + "_" + name, "a")
+def makeTextLog(dir_name, text, date):
+    file = open("data_log/" + dir_name + "/" + date, "a")
     file.write(text)
+    file.close()
 
 
 def startVideo(cam_conf):
@@ -88,10 +82,6 @@ def startVideo(cam_conf):
         # Detect faces on the webcam
         faces = face_classifier.detectMultiScale(frame_gray)
         try:
-            date_today = str(datetime.datetime.now().year) + "." + \
-                         str(datetime.datetime.now().month) + "." + \
-                         str(datetime.datetime.now().day)
-            file = open("data_log/" + date_today + "_DominantEmotions", "a")
             analyze = DeepFace.analyze(frame, actions=('emotion',), enforce_detection=False)
             emotion_values[0] += analyze['emotion']['angry']
             emotion_values[1] += analyze['emotion']['disgust']
@@ -100,13 +90,9 @@ def startVideo(cam_conf):
             emotion_values[4] += analyze['emotion']['sad']
             emotion_values[5] += analyze['emotion']['surprise']
             emotion_values[6] += analyze['emotion']['neutral']
-            print(emotion_values)
-            react()
-            date = str(datetime.datetime.now().hour) + ":" + \
-                   str(datetime.datetime.now().minute) + ":" + \
-                   str(datetime.datetime.now().second)
             emotion = analyze['dominant_emotion']
-            file.write(emotion + "-" + date + "\n")
+            react()
+            makeTextLog('DominantEmotions', emotion + "-" + timeNow() + "\n", dateToday())
         finally:
             font = cv2.FONT_HERSHEY_DUPLEX
         if cam_conf['emotion']:
@@ -118,7 +104,7 @@ def startVideo(cam_conf):
                             fontScale=1,
                             color=(111, 111, 111))
             else:
-                face = faces[0]  # For one face
+                face = faces[0]  # Prendo la prima faccia
                 x, y, w, h = face
                 cv2.putText(img=frame,
                             text=emotion,
@@ -131,26 +117,22 @@ def startVideo(cam_conf):
                               (x + w, y + h),
                               color=(200, 90, 130),
                               thickness=2)
-        # Resize the normal frame
+        # Corregge la grandezza del frame in base alla finestra
         frame = cv2.resize(frame, None, fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_AREA)
-        # Do delle impostazioni lla finestra in base alla scelta dell'utente
-        # cv2.setWindowProperty(frame=frame, full_scrn=full_scrn)
-        # Display the image
+        # Mostro la visione della WebCam in base alle impostazioni scelte dall'utente
         if cam_conf['face']:
             cv2.imshow('Emotion Detector', frame)
-        # Detect if the Esc key has been pressed
+        # Se viene premuto il tasto Esc finisce il ciclo while
         if cv2.waitKey(1) == 27:
             break
-    # Release the video capture object
+    # Ferma la registrazione della Webcam
     cap.release()
-    # Close the file that im writing
-    file.close()
-    # Close all active windows
+    # Chiude tutte le finestre aperte
     cv2.destroyAllWindows()
 
 
-def listaPorte():
-    # Controlla le porte(per la webcam) e ritorna quali ci sono funzionano
+def availablePorts():
+    # Controlla le porte(per la webcam) e ritorna quali ci sono e quali funzionano
     is_working = True
     dev_port = 0
     working_ports = []
@@ -158,60 +140,87 @@ def listaPorte():
         camera = cv2.VideoCapture(dev_port)
         if not camera.isOpened():
             is_working = False
-            print('Port ' + str(dev_port) + ' is not working.')
+            # print('Port ' + str(dev_port) + ' is not working.')
         else:
             is_reading, img = camera.read()
             w = camera.get(3)
             h = camera.get(4)
             if is_reading:
-                print("Port %s is working and reads images (%s x %s)" % (dev_port, h, w))
+                # print("Port %s is working and reads images (%s x %s)" % (dev_port, h, w))
                 working_ports.append(dev_port)
         dev_port += 1
     return working_ports
 
 
 def react():
-    exp = 1000
+    print(emotion_values)
+    exp = 5000
     if emotion_values[0] > counters['angry'] * exp:
+        print('angry' + str(counters['angry']))
         counters['angry'] += counters['angry']
         imagePopUp('cute')
-        print('angry')
     if emotion_values[1] > counters['disgust'] * exp:
+        print('disgust' + str(counters['disgust']))
         counters['disgust'] += counters['disgust']
         imagePopUp('cute')
-        print('disgust')
     if emotion_values[2] > counters['fear'] * exp:
+        print('fear' + str(counters['fear']))
         counters['fear'] += counters['fear']
         if random.randint(0, 1) == 0:
             imagePopUp('calm')
         else:
             imagePopUp('cute')
-        print('fear')
-    if emotion_values[4] > counters['sad'] * 1000:
+    if emotion_values[4] > counters['sad'] * exp:
+        print('sad' + str(counters['sad']))
         counters['sad'] += counters['sad']
         if random.randint(0, 1) == 0:
             imagePopUp('comic')
         else:
             imagePopUp('cute')
-        print('sad')
+
+
+def timeNow():
+    return str(datetime.datetime.now().hour) + ":" + \
+           str(datetime.datetime.now().minute) + ":" + \
+           str(datetime.datetime.now().second)
+
+
+def dateToday():
+    return str(datetime.datetime.now().year) + "." + \
+           str(datetime.datetime.now().month) + "." + \
+           str(datetime.datetime.now().day)
 
 
 def imagePopUp(img_type):
     image_address = ''
     if img_type == 'cute':
-        print('cute')
         if random.randint(0, 1) == 0:
             image_address = 'assets/images/kitties/' + str(random.randint(1, 9)) + '.jpg'
+            engine.say("Guarda questo gattino quanto è carino!")
         else:
             image_address = 'assets/images/puppies/' + str(random.randint(1, 9)) + '.jpg'
+            engine.say("Guarda questo cucciolo quanto è carino!")
     if img_type == 'comic':
-        print('comic')
         image_address = 'assets/images/jokes/' + str(random.randint(1, 19)) + '.jpg'
     if img_type == 'calm':
-        print('calm')
         image_address = 'assets/images/calm_places/' + str(random.randint(1, 9)) + '.jpg'
-    cv2.imshow("Image", cv2.imread(image_address, 1))
+    win_name = "Image: " + img_type
+    cv2.namedWindow(win_name)
+    cv2.moveWindow(win_name, random.randint(50, 100), random.randint(50, 100))
+    cv2.imshow(win_name, cv2.imread(image_address, 1))
 
 
+# language  : en_US, de_DE, ...
+# gender    : VoiceGenderFemale, VoiceGenderMale
+def change_voice(engine, language, gender='VoiceGenderFemale'):
+    for voice in engine.getProperty('voices'):
+        if language in voice.languages and gender == voice.gender:
+            engine.setProperty('voice', voice.id)
+            return True
+
+    raise RuntimeError("Language '{}' for gender '{}' not found".format(language, gender))
+
+
+change_voice(engine, "it_IT", "VoiceGenderFemale")
 # start_video()
-print(listaPorte())
+# print(listaPorte())
