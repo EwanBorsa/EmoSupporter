@@ -7,7 +7,8 @@ file_types = [("JPEG (*.jpg)", "*.jpg"),
               ("All files (*.*)", "*.*")]
 
 
-def confPanel(conf_data, ava_ports):
+def confPanel(conf_data):
+    ava_ports = EmoRec.getPorts()
     SG.theme("Purple")
     # Define the window layout
     layout = [
@@ -26,7 +27,7 @@ def confPanel(conf_data, ava_ports):
                 enable_events=True,
                 default=True)],
         [SG.Text("Webcam disponibili per l'uso:")],
-        [SG.Listbox(webcamList(ava_ports), size=(50, 3), enable_events=False, key='port')],
+        [SG.Combo(webcamList(ava_ports), size=(50, 3), enable_events=False, key='port')],
         [
             SG.Text('Output: '),
             SG.Checkbox(
@@ -35,13 +36,13 @@ def confPanel(conf_data, ava_ports):
                 enable_events=True,
                 default=True),
             SG.Checkbox(
-                'Silenzia voce',
+                'Abilita audio',
                 key='voice',
                 enable_events=True,
                 default=True)
         ],
         [SG.Text('Seleziona sessione:', size=(30, 1))],
-        [SG.Listbox(os.listdir("./data_log/DominantEmotions"), size=(50, 5), enable_events=False, key='session')],
+        [SG.Combo(os.listdir("./data_log/DominantEmotions"), size=(50, 5), enable_events=False, key='session')],
         [SG.Button('Resoconto Statistico', size=(45, 2))],
         [SG.Button('Resoconto Grafico', size=(45, 2))],
         [SG.Button('Salva', size=(45, 2))],
@@ -75,3 +76,10 @@ def webcamList(ava_ports):
     for port in ava_ports:
         ports.append(str(port))
     return ports
+
+
+def takeSession():
+    emo_list = os.listdir("./data_log/DominantEmotions")
+    for session in emo_list:
+        print(session)
+

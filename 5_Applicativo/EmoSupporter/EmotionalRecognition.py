@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 # import tensorflow as tf
 import os
+from threading import Thread
+from time import sleep
 import datetime
 import random
 import pyttsx3
@@ -93,7 +95,10 @@ def startVideo(conf):
             emotion_values[5] += analyze['emotion']['surprise']
             emotion_values[6] += analyze['emotion']['neutral']
             emotion = analyze['dominant_emotion']
-            react()
+            # choseReaction(conf)
+            thread = Thread(target=choseReaction, args=(conf, ))
+            thread.start()
+            thread.join()
             makeTextLog('DominantEmotions', emotion + "-" + timeNow() + "\n", dateToday())
         finally:
             font = cv2.FONT_HERSHEY_DUPLEX
@@ -133,81 +138,100 @@ def startVideo(conf):
     cv2.destroyAllWindows()
 
 
+def runT(function, arguments):
+    thread = Thread(target=function, args=arguments)
+    thread.start()
+    thread.join()
+
+
 def availablePorts():
     # Controlla le porte(per la webcam) e ritorna quali ci sono e quali funzionano
     is_working = True
     dev_port = 0
     working_ports = []
     while is_working:
+        print("enter in the cycling " + str(dev_port))
         camera = cv2.VideoCapture(dev_port)
+        print("open webcam " + str(dev_port))
         if not camera.isOpened():
+            print("dont work " + str(dev_port))
             is_working = False
             # print('Port ' + str(dev_port) + ' is not working.')
         else:
+            print("work " + str(dev_port))
             is_reading, img = camera.read()
             w = camera.get(3)
             h = camera.get(4)
             if is_reading:
+                print("read " + str(dev_port))
                 # print("Port %s is working and reads images (%s x %s)" % (dev_port, h, w))
                 working_ports.append(dev_port)
         dev_port += 1
     return working_ports
 
 
-def react():
+def choseReaction(conf):
     print(emotion_values)
     exp = 5000
     if emotion_values[0] > counters['angry'] * exp:
         print('angry' + str(counters['angry']))
         counters['angry'] += counters['angry']
-        imagePopUp('cute')
+        say("Ti senti arrabbiato?", conf)
+        sleep(5)
+        imagePopUp('cute', conf)
     if emotion_values[1] > counters['disgust'] * exp:
         print('disgust' + str(counters['disgust']))
         counters['disgust'] += counters['disgust']
-        imagePopUp('cute')
+        say("Ti fa schifo?", conf)
+        sleep(5)
+        imagePopUp('cute', conf)
     if emotion_values[2] > counters['fear'] * exp:
         print('fear' + str(counters['fear']))
         counters['fear'] += counters['fear']
+        say("Hai paura?", conf)
+        sleep(5)
         if random.randint(0, 1) == 0:
-            imagePopUp('calm')
+            imagePopUp('calm', conf)
         else:
-            imagePopUp('cute')
+            imagePopUp('cute', conf)
     if emotion_values[4] > counters['sad'] * exp:
         print('sad' + str(counters['sad']))
         counters['sad'] += counters['sad']
+        say("Ti senti triste?", conf)
+        sleep(5)
         if random.randint(0, 1) == 0:
-            imagePopUp('comic')
+            imagePopUp('comic', conf)
         else:
-            imagePopUp('cute')
+            imagePopUp('cute', conf)
 
 
-def timeNow():
+def timeNow():  # Orario di adesso
     return str(datetime.datetime.now().hour) + ":" + \
            str(datetime.datetime.now().minute) + ":" + \
            str(datetime.datetime.now().second)
 
 
-def dateToday():
+def dateToday():  # Data di oggi
     return str(datetime.datetime.now().year) + "." + \
            str(datetime.datetime.now().month) + "." + \
            str(datetime.datetime.now().day)
 
 
-def imagePopUp(img_type):
+def imagePopUp(img_type, conf):
     image_address = ''
     if img_type == 'cute':
         if random.randint(0, 1) == 0:
             image_address = 'assets/images/kitties/' + str(random.randint(1, 9)) + '.jpg'
-            engine.say("Guarda questo gattino quanto è carino!")
+            say("Guarda questo gattino quanto è carino!", conf)
         else:
             image_address = 'assets/images/puppies/' + str(random.randint(1, 9)) + '.jpg'
-            engine.say("Guarda questo cucciolo quanto è carino!")
+            say("Guarda questo cucciolo quanto è carino!", conf)
     if img_type == 'comic':
         image_address = 'assets/images/jokes/' + str(random.randint(1, 19)) + '.jpg'
-        engine.say("Guarda questa battuta, che ridere")
+        say("Guarda questa battuta, che ridere", conf)
     if img_type == 'calm':
         image_address = 'assets/images/calm_places/' + str(random.randint(1, 9)) + '.jpg'
-        engine.say("Molto rilassante quel paesaggio, non trovi?")
+        say("Molto rilassante quel paesaggio, non trovi?", conf)
     win_name = "Image: " + img_type
     cv2.namedWindow(win_name)
     cv2.moveWindow(win_name, random.randint(50, 100), random.randint(50, 100))
@@ -221,7 +245,12 @@ def change_voice(eng, language):
         if language in str(voice.name).lower():
             eng.setProperty('voice', voice.id)
             return True
-    raise RuntimeError("Language '{}' not found".format(language))
+    raise RuntimeError("Lingua '{}' non trovata".format(language))
+
+
+def say(phrase, conf):
+    if conf['output']['voice']:
+        engine.say(phrase)
 
 
 change_voice(engine, "ita")
