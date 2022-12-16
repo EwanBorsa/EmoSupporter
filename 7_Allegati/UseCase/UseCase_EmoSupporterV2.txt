@@ -3,12 +3,11 @@ left to right direction
 skinparam packageStyle rectangle
 rectangle Interazione_Utente {
 actor Utente
-Utente -- (Apre l'Applicazione)
+Utente -- (Configura l'Applicazione)
 Utente -- (Avvia la Registrazione)
 Utente -- (Guarda la WebCam) 
 Utente -- (Visualizza il Report)
 
-(Configura l'Applicazione) ..> (Apre l'Applicazione) : extend
 (Tipo di Report) ..> (Visualizza il Report) : extend
 (Scarica testo) ..> (Tipo di Report) : extend
 (Scarica immagine) .> (Tipo di Report) : extend
@@ -24,7 +23,8 @@ App -- (Interagisce con l'Utente)
 (Registra dati dell'Utente) .> (Riconosce espressione facciale) : include
 
 (Rileva volto dell'Utente) ..> (Cattura i frame del volto) : include
-(Cattura i frame del volto) .> (Usa config) : include
+(Cattura i frame del volto) .> (Interpreta emozioni) : include
+(Interpreta emozioni) .> (Salva dati): include
 
 (Immagini Pop-Up) .> (Interagisce con l'Utente) : extend
 (Risposta Vocale) ..> (Interagisce con l'Utente) : extend
