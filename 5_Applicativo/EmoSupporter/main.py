@@ -8,15 +8,13 @@ conf_data = {'cam': {'face': True, 'emotion': True, 'color': 'Purple', 'port': 0
              'output': {'popup': True, 'voice': True},
              'user': {'name': 'utente'}}
 
-ava_ports = EmoRec.availablePorts()
-
 
 def on_clicked(icon, item):
     if str(item) == "Inizia registrazione":
         icon.notify("Video capturing...")
-        EmoRec.startVideo(conf_data)
+        EmoRec.start_video(conf_data)
     elif str(item) == "Impostazioni":
-        Panel.confPanel(conf_data, ava_ports)
+        Panel.conf_panel(conf_data)
     elif str(item) == "Esci dall'app":
         icon.stop()
 
