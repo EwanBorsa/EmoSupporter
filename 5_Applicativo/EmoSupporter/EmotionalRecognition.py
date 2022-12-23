@@ -1,16 +1,14 @@
-# from xml.etree.ElementTree import TreeBuilder
-import cv2
 from deepface import DeepFace
 from keras import models
-import numpy as np
-import matplotlib.pyplot as plt
-# import tensorflow as tf
-import os
 from threading import Thread
 from time import sleep
+import matplotlib.pyplot as plt
+import numpy as np
+import cv2
+import pyttsx3
+import os
 import datetime
 import random
-import pyttsx3
 
 engine = pyttsx3.init()
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -25,22 +23,20 @@ counters = {'angry': 1, 'fear': 1, 'disgust': 1, 'sad': 1}
 # Haar Cascade classifiers are an effective way for object detection.
 face_classifier = cv2.CascadeClassifier()
 face_classifier.load(cv2.samples.findFile(haarcascadePath))
-# dataset1 = tf.data_log.Dataset.from_tensor_slices(tf.random.uniform([4, 10]))
-# print(dataset1.element_spec)
 
 
-def calculatePerc():
-    tot_emotion = 1
+def calculate_perc():
+    tot_emotion = 0
     for value in emotion_values:
         tot_emotion += value
     emotion_perc = [0, 0, 0, 0, 0, 0, 0]
-    for i in emotion_perc:
+    for i in range(0, len(emotion_perc)):
         emotion_perc[i] = emotion_values[i] / tot_emotion
     return emotion_perc
 
 
-def makeStatText():
-    emotion_perc = calculatePerc()
+def make_stat_text():
+    emotion_perc = calculate_perc()
     text = "\t_\tStatistic _ Report\t_\n\n\n"
     i = 0
     for value in emotion_perc:
@@ -49,28 +45,34 @@ def makeStatText():
     return text
 
 
-def askStatReport(session):
-    text = makeStatText()
+def ask_stat_report(session):
+    text = make_stat_text()
     print(text)
 
 
-def makeGraph():
-    print('d')
-    # make a graph
+def make_graph():
+    fig, ax = plt.subplots()
+
+    ax.bar(emotion_labels, emotion_values, label=emotion_labels, color=emotion_colors)
+
+    ax.set_ylabel('livello')
+    ax.set_title('Livelli di Emozioni')
+    ax.legend(title='Legenda')
+
+    plt.show()
 
 
-def askGraphReport(session):
-    print("d")
-    # make
+def ask_graph_report(session):
+    make_graph()
 
 
-def makeTextLog(dir_name, text, date):
+def make_text_log(dir_name, text, date):
     file = open("data_log/" + dir_name + "/" + date, "a")
     file.write(text)
     file.close()
 
 
-def startVideo(conf):
+def start_video(conf):
     engine.say("Benvenuto " + conf['user']['name'] + " ad una nuova sessione")
     # Initialize video capture
     cap = cv2.VideoCapture(conf['cam']['port'])
@@ -96,10 +98,10 @@ def startVideo(conf):
             emotion_values[6] += analyze['emotion']['neutral']
             emotion = analyze['dominant_emotion']
             # choseReaction(conf)
-            thread = Thread(target=choseReaction, args=(conf, ))
+            thread = Thread(target=chose_reaction, args=(conf,))
             thread.start()
             thread.join()
-            makeTextLog('DominantEmotions', emotion + "-" + timeNow() + "\n", dateToday())
+            make_text_log('DominantEmotions', emotion + "-" + time_now() + "\n", date_today())
         finally:
             font = cv2.FONT_HERSHEY_DUPLEX
         if conf['cam']['emotion']:
@@ -138,13 +140,13 @@ def startVideo(conf):
     cv2.destroyAllWindows()
 
 
-def runT(function, arguments):
+def run_thread(function, arguments):
     thread = Thread(target=function, args=arguments)
     thread.start()
     thread.join()
 
 
-def availablePorts():
+def available_ports():
     # Controlla le porte(per la webcam) e ritorna quali ci sono e quali funzionano
     is_working = True
     dev_port = 0
@@ -170,7 +172,7 @@ def availablePorts():
     return working_ports
 
 
-def choseReaction(conf):
+def chose_reaction(conf):
     print(emotion_values)
     exp = 5000
     if emotion_values[0] > counters['angry'] * exp:
@@ -178,46 +180,46 @@ def choseReaction(conf):
         counters['angry'] += counters['angry']
         say("Ti senti arrabbiato?", conf)
         sleep(5)
-        imagePopUp('cute', conf)
+        image_popup('cute', conf)
     if emotion_values[1] > counters['disgust'] * exp:
         print('disgust' + str(counters['disgust']))
         counters['disgust'] += counters['disgust']
         say("Ti fa schifo?", conf)
         sleep(5)
-        imagePopUp('cute', conf)
+        image_popup('cute', conf)
     if emotion_values[2] > counters['fear'] * exp:
         print('fear' + str(counters['fear']))
         counters['fear'] += counters['fear']
         say("Hai paura?", conf)
         sleep(5)
         if random.randint(0, 1) == 0:
-            imagePopUp('calm', conf)
+            image_popup('calm', conf)
         else:
-            imagePopUp('cute', conf)
+            image_popup('cute', conf)
     if emotion_values[4] > counters['sad'] * exp:
         print('sad' + str(counters['sad']))
         counters['sad'] += counters['sad']
         say("Ti senti triste?", conf)
         sleep(5)
         if random.randint(0, 1) == 0:
-            imagePopUp('comic', conf)
+            image_popup('comic', conf)
         else:
-            imagePopUp('cute', conf)
+            image_popup('cute', conf)
 
 
-def timeNow():  # Orario di adesso
+def time_now():  # Orario di adesso
     return str(datetime.datetime.now().hour) + ":" + \
            str(datetime.datetime.now().minute) + ":" + \
            str(datetime.datetime.now().second)
 
 
-def dateToday():  # Data di oggi
+def date_today():  # Data di oggi
     return str(datetime.datetime.now().year) + "." + \
            str(datetime.datetime.now().month) + "." + \
            str(datetime.datetime.now().day)
 
 
-def imagePopUp(img_type, conf):
+def image_popup(img_type, conf):
     image_address = ''
     if img_type == 'cute':
         if random.randint(0, 1) == 0:
@@ -234,7 +236,6 @@ def imagePopUp(img_type, conf):
         say("Molto rilassante quel paesaggio, non trovi?", conf)
     win_name = "Image: " + img_type
     cv2.namedWindow(win_name)
-    cv2.moveWindow(win_name, random.randint(50, 100), random.randint(50, 100))
     cv2.imshow(win_name, cv2.imread(image_address, 1))
 
 
@@ -254,5 +255,3 @@ def say(phrase, conf):
 
 
 change_voice(engine, "ita")
-# start_video()
-# print(listaPorte())
