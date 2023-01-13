@@ -1,0 +1,1 @@
+powershell pyinstaller "main.py" -F -w -i "assets/images/eco.ico"
